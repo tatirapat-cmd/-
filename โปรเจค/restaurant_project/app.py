@@ -489,6 +489,6 @@ def report():
         return redirect(url_for('index'))
     return render_template('report.html', report=generate_sales_report())
 
+# app.py (เฉพาะบรรทัดล่างสุด)
 if __name__ == '__main__':
-    print("🚀 เริ่มรันระบบร้านอาหารที่ http://127.0.0.1:5000")
     app.run(debug=True, port=5000)
