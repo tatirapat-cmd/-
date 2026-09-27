@@ -1,0 +1,146 @@
+[
+  {
+    "timestamp": "2026-09-24 21:37:04",
+    "username": "TBO",
+    "action": "ADD_MENU",
+    "details": "เพิ่มเมนู ID:1 กะเพราไก่ไข่ดาว ราคา 60.0"
+  },
+  {
+    "timestamp": "2026-09-24 21:42:08",
+    "username": "TBO",
+    "action": "CHECKOUT",
+    "details": "เช็คบิลโต๊ะ 1 ยอดรวม 70.62 บาท"
+  },
+  {
+    "timestamp": "2026-09-24 21:57:17",
+    "username": "TBO",
+    "action": "ADD_TABLE",
+    "details": "เพิ่มโต๊ะหมายเลข 67"
+  },
+  {
+    "timestamp": "2026-09-24 21:57:58",
+    "username": "TBO",
+    "action": "CHECKOUT",
+    "details": "เช็คบิลโต๊ะ 67 ยอดรวม 141.24 บาท"
+  },
+  {
+    "timestamp": "2026-09-24 22:00:34",
+    "username": "TBO",
+    "action": "CHECKOUT",
+    "details": "เช็คบิลโต๊ะ 67 ยอดรวม 211.86 บาท"
+  },
+  {
+    "timestamp": "2026-09-24 22:02:44",
+    "username": "TBO",
+    "action": "CHECKOUT",
+    "details": "เช็คบิลโต๊ะ 1 ยอดรวม 70.62 บาท"
+  },
+  {
+    "timestamp": "2026-09-24 22:03:50",
+    "username": "TBO",
+    "action": "ADD_MENU",
+    "details": "เพิ่มเมนู ID:2 Pizza ราคา 300.0"
+  },
+  {
+    "timestamp": "2026-09-24 22:04:23",
+    "username": "TBO",
+    "action": "CHECKOUT",
+    "details": "เช็คบิลโต๊ะ 1 ยอดรวม 353.10 บาท"
+  },
+  {
+    "timestamp": "2026-09-27 17:14:09",
+    "username": "1",
+    "action": "RESERVE_TABLE",
+    "details": "จองโต๊ะ 67 เวลา 15.30"
+  },
+  {
+    "timestamp": "2026-09-27 17:24:09",
+    "username": "TBO",
+    "action": "CHECKOUT",
+    "details": "เช็คบิลโต๊ะ 1 ยอดรวม 1412.40 บาท"
+  },
+  {
+    "timestamp": "2026-09-27 17:24:27",
+    "username": "TBO",
+    "action": "ADD_TABLE",
+    "details": "เพิ่มโต๊ะหมายเลข 68"
+  },
+  {
+    "timestamp": "2026-09-27 17:24:37",
+    "username": "TBO",
+    "action": "DELETE_MENU",
+    "details": "ลบเมนู ID:1"
+  },
+  {
+    "timestamp": "2026-09-27 17:24:41",
+    "username": "TBO",
+    "action": "DELETE_TABLE",
+    "details": "ลบโต๊ะหมายเลข 68"
+  },
+  {
+    "timestamp": "2026-09-27 17:29:24",
+    "username": "1",
+    "action": "AUTO_RESERVE_TABLE",
+    "details": "จัดโต๊ะ 1 สำหรับ 15 ท่าน เวลา 19.00"
+  },
+  {
+    "timestamp": "2026-09-27 17:34:09",
+    "username": "TBO",
+    "action": "CHECKOUT",
+    "details": "เช็คบิลโต๊ะ 67 ยอดรวม 353.10 บาท"
+  },
+  {
+    "timestamp": "2026-09-27 17:34:11",
+    "username": "TBO",
+    "action": "CHECKOUT",
+    "details": "เช็คบิลโต๊ะ 3 ยอดรวม 353.10 บาท"
+  },
+  {
+    "timestamp": "2026-09-27 17:34:18",
+    "username": "TBO",
+    "action": "CHECKOUT",
+    "details": "เช็คบิลโต๊ะ 1 ยอดรวม 353.10 บาท"
+  },
+  {
+    "timestamp": "2026-09-27 17:41:42",
+    "username": "TBO",
+    "action": "CHECKOUT",
+    "details": "เช็คบิลโต๊ะ 1 ยอดรวม 353.10 บาท"
+  },
+  {
+    "timestamp": "2026-09-27 18:02:03",
+    "username": "1",
+    "action": "AUTO_RESERVE_TABLE",
+    "details": "จัดโต๊ะ 1 สำหรับ 2 ท่าน เวลา 15.30"
+  },
+  {
+    "timestamp": "2026-09-27 18:06:26",
+    "username": "TBO",
+    "action": "CHECKOUT",
+    "details": "เช็คบิลโต๊ะ 1 ยอดรวม 353.10 บาท"
+  },
+  {
+    "timestamp": "2026-09-27 18:13:50",
+    "username": "1",
+    "action": "AUTO_RESERVE_TABLE",
+    "details": "จัดโต๊ะ 1 สำหรับ 2 ท่าน เวลา 15.30"
+  },
+  {
+    "timestamp": "2026-09-27 18:15:06",
+    "username": "TBO",
+    "action": "CHECKOUT",
+    "details": "เช็คบิลโต๊ะ 1 ยอดรวม 1412.40 บาท"
+  },
+  {
+    "timestamp": "2026-09-27 18:19:01",
+    "username": "1",
+    "action": "AUTO_RESERVE_TABLE",
+    "details": "จัดโต๊ะ 1 สำหรับ 2 ท่าน เวลา 18.30"
+  },
+  {
+    "timestamp": "2026-09-27 18:20:15",
+    "username": "TBO",
+    "action": "CHECKOUT",
+    "details": "เช็คบิลโต๊ะ 1 ยอดรวม 353.10 บาท (ลูกค้า: 1, แลดแต้ม: 0, ได้รับแต้ม: +35)"
+  }
+]

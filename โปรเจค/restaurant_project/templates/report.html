@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+{% block content %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<div class="space-y-6">
+  <!-- Header bar -->
+  <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex justify-between items-center">
+    <div class="flex items-center gap-3">
+      <span class="text-2xl">📊</span>
+      <h2 class="text-xl font-bold text-slate-800">รายงานสรุปยอดขายและกราฟวิเคราะห์</h2>
+    </div>
+    <a href="/" class="bg-slate-200 hover:bg-slate-300 text-slate-700 text-sm font-semibold px-4 py-2 rounded-lg transition flex items-center gap-1">
+      ⬅️ กลับหน้าหลัก
+    </a>
+  </div>
+
+  <!-- การ์ดสรุปยอดเงินและภาษี -->
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+    <div class="bg-gradient-to-br from-emerald-500 to-teal-700 text-white p-5 rounded-2xl shadow-md">
+      <div class="text-xs font-medium text-emerald-100">ยอดขายรวมสุทธิ (Net Total)</div>
+      <div class="text-3xl font-extrabold mt-2">{{ "%.2f"|format(report.total_revenue) }} ฿</div>
+      <div class="text-[10px] text-emerald-200 mt-1">*รวม Service Charge 10% & VAT 7% แล้ว</div>
+    </div>
+
+    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
+      <div class="text-slate-500 text-xs font-medium">ยอดขายเฉพาะอาหาร (Raw)</div>
+      <div class="text-2xl font-bold text-slate-800 mt-2">{{ "%.2f"|format(report.raw_revenue) }} ฿</div>
+    </div>
+
+    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
+      <div class="text-slate-500 text-xs font-medium">ค่าบริการ (Service Charge 10%)</div>
+      <div class="text-2xl font-bold text-indigo-600 mt-2">{{ "%.2f"|format(report.total_service_charge) }} ฿</div>
+    </div>
+
+    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
+      <div class="text-slate-500 text-xs font-medium">ภาษีมูลค่าเพิ่ม (VAT 7%)</div>
+      <div class="text-2xl font-bold text-amber-600 mt-2">{{ "%.2f"|format(report.total_vat) }} ฿</div>
+    </div>
+  </div>
+
+  <!-- กราฟวิเคราะห์ -->
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 flex flex-col justify-between">
+      <h3 class="text-lg font-bold text-slate-800 mb-4">🏆 กราฟแสดงเมนูขายดี Top 5 (จำนวนจาน)</h3>
+      <div class="relative h-72 flex items-center justify-center">
+        <canvas id="bestsellerChart"></canvas>
+      </div>
+    </div>
+
+    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 flex flex-col justify-between">
+      <h3 class="text-lg font-bold text-slate-800 mb-4">🍩 สัดส่วนยอดขายสุทธิแยกตามหมวดหมู่ (บาท)</h3>
+      <div class="relative h-72 flex items-center justify-center">
+        <canvas id="categoryChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- รายละเอียดเมนูขายดี -->
+  <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+    <h3 class="text-lg font-bold text-slate-800 mb-4">📋 รายละเอียดเมนูขายดี</h3>
+    <ul class="divide-y">
+      {% for name, qty in report.best_sellers %}
+      <li class="py-3 flex justify-between items-center">
+        <span class="font-medium text-slate-700">{{ loop.index }}. {{ name }}</span>
+        <span class="bg-indigo-50 text-indigo-700 text-xs px-3 py-1 rounded-full font-bold">ขายได้ {{ qty }} จาน</span>
+      </li>
+      {% else %}
+      <li class="py-3 text-slate-400 text-center">ยังไม่มีข้อมูลยอดขาย</li>
+      {% endfor %}
+    </ul>
+  </div>
+</div>
+
+<script>
+  const bestSellersData = JSON.parse('{{ report.best_sellers | tojson | safe }}');
+  const categoryRevenueData = JSON.parse('{{ report.category_revenue | tojson | safe }}');
+
+  const bsLabels = bestSellersData.map(item => item[0]);
+  const bsValues = bestSellersData.map(item => item[1]);
+
+  // 📊 กราฟแท่ง Top 5 เมนูขายดี
+  const ctxBar = document.getElementById('bestsellerChart').getContext('2d');
+  new Chart(ctxBar, {
+    type: 'bar',
+    data: {
+      labels: bsLabels.length > 0 ? bsLabels : ['ยังไม่มีข้อมูล'],
+      datasets: [{
+        label: 'จำนวนที่ขายได้ (จาน)',
+        data: bsValues.length > 0 ? bsValues : [0],
+        backgroundColor: 'rgba(99, 102, 241, 0.8)',
+        borderColor: 'rgba(99, 102, 241, 1)',
+        borderWidth: 1,
+        borderRadius: 6
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        y: { beginAtZero: true, ticks: { stepSize: 1 } }
+      }
+    }
+  });
+
+  // 🍩 กราฟวงกลม สัดส่วนยอดขายแยกตามหมวดหมู่
+  const catLabels = Object.keys(categoryRevenueData);
+  const catValues = Object.values(categoryRevenueData);
+
+  const ctxDoughnut = document.getElementById('categoryChart').getContext('2d');
+  new Chart(ctxDoughnut, {
+    type: 'doughnut',
+    data: {
+      labels: catLabels.length > 0 ? catLabels : ['ยังไม่มีข้อมูล'],
+      datasets: [{
+        data: catValues.length > 0 ? catValues : [1],
+        backgroundColor: [
+          'rgba(99, 102, 241, 0.8)',
+          'rgba(16, 185, 129, 0.8)',
+          'rgba(245, 158, 11, 0.8)',
+          'rgba(239, 68, 68, 0.8)',
+          'rgba(168, 85, 247, 0.8)',
+          'rgba(107, 114, 128, 0.8)'
+        ],
+        borderWidth: 2
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { position: 'bottom', labels: { boxWidth: 12 } }
+      }
+    }
+  });
+</script>
+{% endblock %}

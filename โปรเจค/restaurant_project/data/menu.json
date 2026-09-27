@@ -1,0 +1,18 @@
+[
+    {
+        "id": 1,
+        "name": "Gazpacho",
+        "category": "อาหาร",
+        "price": 150.0,
+        "is_available": true,
+        "image_url": "https://eatingtheglobe.com/wp-content/uploads/2015/12/imageslike.com-large-gazpacho-gazpacho.jpg"
+    },
+    {
+        "id": 2,
+        "name": "Porchetta",
+        "category": "อาหารจานหลัก (Main Courses)",
+        "price": 250.0,
+        "is_available": true,
+        "image_url": "https://www.foodandwine.com/thmb/XuScjet66l3Uz5iEpnodPb8cD9A=/750x0/filters:no_upscale():max_bytes(150000):strip_icc():format(webp)/Porchetta-FT-RECIPE-0324-f40395c0c4324417a37dbe708962310a.jpg"
+    }
+]

@@ -1,0 +1,498 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="space-y-6 pb-24">
+  <!-- Header bar -->
+  <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-col md:flex-row justify-between md:items-center gap-4">
+    <div class="flex items-center gap-3">
+      <span class="text-2xl">🍽️</span>
+      <div>
+        {% if session.get('user') and session['user']['role'] == 'customer' %}
+        <h2 class="text-xl font-bold text-slate-800">ระบบสั่งอาหารออนไลน์ (โต๊ะของคุณ)</h2>
+        <p class="text-xs text-slate-500">เลือกคลิกเมนูอาหารด้านล่าง -> ปรับตัวเลือกเสริม -> สั่งอาหารเข้าห้องครัว</p>
+        {% else %}
+        <h2 class="text-xl font-bold text-slate-800">จัดการโต๊ะ สแกนสั่งอาหาร & QR Code (สำหรับเจ้าหน้าที่)</h2>
+        <p class="text-xs text-slate-500">จัดการสถานะโต๊ะ ตั้งค่ารูป QR Code ประจำโต๊ะ ย้าย/รวมโต๊ะ และเช็คบิล</p>
+        {% endif %}
+      </div>
+    </div>
+    
+    <div class="flex items-center gap-2">
+      {% if session.get('user') and session['user']['role'] in ['admin', 'staff'] %}
+      <form action="/add_table" method="POST" class="flex gap-2">
+        <input type="number" name="table_id" placeholder="เลขโต๊ะ" class="w-24 text-xs p-2 border rounded-lg outline-none">
+        <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold px-3 py-2 rounded-lg transition whitespace-nowrap">
+          ➕ เพิ่มโต๊ะ
+        </button>
+      </form>
+      {% endif %}
+      <a href="/" class="bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-semibold px-3 py-2 rounded-lg transition flex items-center gap-1">
+        ⬅️ กลับหน้าหลัก
+      </a>
+    </div>
+  </div>
+
+  <!-- แถบเลือกโต๊ะปัจจุบันที่กำลังจะสั่ง -->
+  <div class="bg-indigo-900 text-white p-4 rounded-xl shadow-md flex justify-between items-center">
+    <div class="flex items-center gap-3">
+      <span class="text-lg font-bold">📍 โต๊ะที่กำลังสั่งอาหาร:</span>
+      <select id="selectedTableSelect" onchange="changeActiveTable()" class="bg-indigo-800 text-amber-300 text-base font-bold p-2 rounded-lg border border-indigo-700 outline-none">
+        {% for table in tables %}
+          <option value="{{ table.table_id }}">โต๊ะหมายเลข {{ table.table_id }} (สถานะ: {{ table.status }})</option>
+        {% endfor %}
+      </select>
+    </div>
+    {% if session.get('user') and session['user']['role'] == 'customer' %}
+    <div class="text-xs text-emerald-300 font-semibold">🔒 รายการเฉพาะโต๊ะของคุณ</div>
+    {% else %}
+    <div class="text-xs text-indigo-200">เลือกโต๊ะที่ต้องการทำรายการสั่งอาหาร</div>
+    {% endif %}
+  </div>
+
+  <!-- การ์ดแสดงข้อมูลโต๊ะ + ส่วน QR Code -->
+  <div class="grid grid-cols-1 {% if session.get('user') and session['user']['role'] != 'customer' %}md:grid-cols-3{% endif %} gap-6">
+    {% for table in tables %}
+    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between space-y-3">
+      <div>
+        <div class="flex justify-between items-center mb-2">
+          <h3 class="font-extrabold text-slate-800 text-lg">โต๊ะหมายเลข {{ table.table_id }}</h3>
+          {% if table.status == 'ว่าง' %}
+            <span class="px-2.5 py-0.5 bg-green-100 text-green-700 font-bold text-xs rounded-full">🟢 พร้อมสั่งอาหาร</span>
+          {% elif table.status == 'จองแล้ว' %}
+            <span class="px-2.5 py-0.5 bg-amber-100 text-amber-800 font-bold text-xs rounded-full">🟡 จองแล้ว</span>
+          {% elif table.status == 'รอเช็คบิล' %}
+            <span class="px-2.5 py-0.5 bg-purple-100 text-purple-800 font-bold text-xs rounded-full">🟣 รอเช็คบิล</span>
+          {% else %}
+            <span class="px-2.5 py-0.5 bg-red-100 text-red-700 font-bold text-xs rounded-full">🔴 กำลังรับประทาน</span>
+          {% endif %}
+        </div>
+
+        <!-- 📱 ส่วนแสดง QR Code ประจำโต๊ะ -->
+        <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 text-center mb-3">
+          {% if table.qr_code_url %}
+          <img src="{{ table.qr_code_url }}" alt="QR Code โต๊ะ {{ table.table_id }}" class="w-28 h-28 mx-auto object-cover rounded-lg border bg-white shadow-sm mb-2">
+          {% else %}
+          <div class="w-28 h-28 mx-auto bg-slate-200 flex flex-col items-center justify-center rounded-lg text-slate-400 text-xs mb-2">
+            <span>📱</span>
+            <span>ยังไม่มี QR Code</span>
+          </div>
+          {% endif %}
+          
+          <div class="text-[11px] text-slate-500">
+            <span>🔗 ลิงก์ตรงประจำโต๊ะ: </span>
+            <a href="/order/table/{{ table.table_id }}" target="_blank" class="text-indigo-600 font-bold underline hover:text-indigo-800">
+              /order/table/{{ table.table_id }}
+            </a>
+          </div>
+        </div>
+
+        <!-- ช่องให้ใส่ URL รูปภาพ QR Code สำหรับ Admin/Staff -->
+        {% if session.get('user') and session['user']['role'] in ['admin', 'staff'] %}
+        <details class="bg-indigo-50/60 p-2.5 rounded-xl border border-indigo-100 text-xs mb-3">
+          <summary class="font-bold text-indigo-900 cursor-pointer select-none py-0.5">🖼️ ใส่ URL รูปภาพ QR Code โต๊ะนี้</summary>
+          <form action="/update_table_qr/{{ table.table_id }}" method="POST" class="space-y-2 mt-2 pt-2 border-t border-indigo-200">
+            <input type="url" name="qr_code_url" value="{{ table.qr_code_url | default('') }}" placeholder="แปะ URL รูป QR Code (https://...)" class="w-full p-2 text-xs border rounded-lg outline-none bg-white">
+            <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-1.5 rounded-lg transition">
+              💾 บันทึกรูป QR Code
+            </button>
+          </form>
+        </details>
+        {% endif %}
+
+        {% if table.status == 'จองแล้ว' and table.reservation %}
+        <div class="bg-amber-50 p-3 rounded-xl border border-amber-200 text-xs space-y-1 mb-2">
+          <div class="font-bold text-amber-900">👤 ชื่อผู้จอง: {{ table.reservation.customer_name }}</div>
+          <div class="text-amber-800">📞 เบอร์โทรศัพท์: {{ table.reservation.phone }}</div>
+          {% if table.reservation.guests_count %}
+          <div class="text-amber-800 font-semibold">👥 จำนวน: {{ table.reservation.guests_count }} ท่าน</div>
+          {% endif %}
+          <div class="text-amber-800">⏰ เวลาจอง: {{ table.reservation.reserve_time }}</div>
+        </div>
+        {% endif %}
+
+        <!-- รายการอาหารที่สั่ง -->
+        <div class="bg-slate-50 p-3 rounded-xl border text-xs space-y-2 mb-2">
+          <div class="font-bold text-slate-700 border-b pb-1 flex justify-between">
+            <span>🛒 รายการอาหารที่สั่งเข้าห้องครัว:</span>
+            <span class="text-[10px] text-slate-400">คลิก ❌ เพื่อยกเลิก</span>
+          </div>
+          {% set active_orders = orders | selectattr('table_id', 'equalto', table.table_id) | rejectattr('status', 'equalto', 'ชำระเงินแล้ว') | rejectattr('status', 'equalto', 'ปิดบิล') | list %}
+          {% if active_orders %}
+            <ul class="divide-y divide-slate-200">
+              {% for o in active_orders %}
+              <li class="py-1.5 flex justify-between items-center gap-1">
+                <div class="flex-1 min-w-0">
+                  <span class="font-bold text-slate-800 truncate block">{{ o.menu_name }}</span>
+                  {% if o.options %}
+                  <span class="text-[10px] text-amber-600 block">{{ o.options }}</span>
+                  {% endif %}
+                  <span class="text-slate-500 text-[10px]">{{ "%.2f"|format(o.price) }}฿ x {{ o.quantity }} = {{ "%.2f"|format(o.price * o.quantity) }}฿</span>
+                </div>
+                <div class="flex items-center gap-1">
+                  <span class="px-1.5 py-0.5 text-[10px] rounded font-semibold {% if o.status == 'รอดำเนินการ' %}bg-amber-100 text-amber-800{% elif o.status == 'กำลังเตรียม' %}bg-blue-100 text-blue-800{% else %}bg-green-100 text-green-800{% endif %}">
+                    {{ o.status }}
+                  </span>
+                  <form action="/cancel_order/{{ o.order_id }}" method="POST" class="inline">
+                    <input type="hidden" name="quantity" value="1">
+                    <button type="submit" title="ยกเลิก/ลด" class="text-red-500 hover:text-red-700 font-bold px-1 text-xs">❌</button>
+                  </form>
+                </div>
+              </li>
+              {% endfor %}
+            </ul>
+          {% else %}
+            <div class="text-slate-400 text-center py-2">ยังไม่มีรายการอาหาร กดเลือกเมนูด้านล่างเพื่อสั่งได้เลย</div>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- ปุ่มกดการทำงาน -->
+      <div class="space-y-2 pt-2 border-t">
+        {% if table.status == 'จองแล้ว' %}
+          <div class="flex gap-2">
+            <form action="/occupy_table/{{ table.table_id }}" method="POST" class="flex-1">
+              <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold py-2.5 rounded-xl transition shadow">
+                🟢 เปิดโต๊ะ (ลูกค้ามาถึงร้านแล้ว)
+              </button>
+            </form>
+            <form action="/cancel_reservation/{{ table.table_id }}" method="POST">
+              <button type="submit" class="bg-red-500 hover:bg-red-600 text-white text-xs font-bold py-2.5 px-3 rounded-xl transition">
+                ❌ ยกเลิกการจอง
+              </button>
+            </form>
+          </div>
+        {% elif table.status == 'มีลูกค้า' %}
+          <form action="/request_bill/{{ table.table_id }}" method="POST">
+            <button type="submit" class="w-full bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold py-2.5 rounded-xl transition shadow">
+              🔔 แจ้งเรียกพนักงานเช็คบิล
+            </button>
+          </form>
+
+          {% if session.get('user') and session['user']['role'] in ['admin', 'staff'] %}
+          <form action="/move_table" method="POST" onsubmit="return confirm('ยืนยันการย้าย/รวมรายการอาหาร?');" class="flex gap-2 items-center">
+            <input type="hidden" name="from_table_id" value="{{ table.table_id }}">
+            <select name="to_table_id" required class="flex-1 text-xs p-2 border rounded-xl bg-slate-50 outline-none">
+              <option value="">-- ย้าย/รวมไปโต๊ะ --</option>
+              {% for target in tables if target.table_id != table.table_id %}
+                <option value="{{ target.table_id }}">โต๊ะ {{ target.table_id }} ({{ target.status }})</option>
+              {% endfor %}
+            </select>
+            <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-3 py-2 rounded-xl transition whitespace-nowrap">
+              🔄 ย้าย/รวม
+            </button>
+          </form>
+
+          <a href="/checkout/{{ table.table_id }}" class="block text-center bg-amber-500 hover:bg-amber-600 text-slate-900 text-xs font-bold py-2.5 rounded-xl transition shadow">
+            🧾 เช็คบิล / รับเงิน
+          </a>
+          {% endif %}
+
+        {% elif table.status == 'รอเช็คบิล' %}
+          <div class="text-center bg-purple-50 text-purple-800 p-2 rounded-xl text-xs font-bold border border-purple-200">
+            ⏳ กำลังรอพนักงานมาเช็คบิล
+          </div>
+          {% if session.get('user') and session['user']['role'] in ['admin', 'staff'] %}
+          <a href="/checkout/{{ table.table_id }}" class="block text-center bg-amber-500 hover:bg-amber-600 text-slate-900 text-xs font-bold py-2.5 rounded-xl transition shadow">
+            🧾 เช็คบิล / รับเงิน
+          </a>
+          {% endif %}
+        {% endif %}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <!-- 🍔 เมนูอาหารแบบการ์ดสไตล์ Grab -->
+  <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 mt-6">
+    <h3 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+      <span>📖 รายการเมนูอาหาร (กดเพื่อเลือกรสชาติ/ท็อปปิ้ง)</span>
+    </h3>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      {% for m in menu %}
+      {% if m.is_available %}
+      <div data-id="{{ m.id }}"
+           data-name="{{ m.name }}"
+           data-price="{{ m.price }}"
+           data-img="{{ m.image_url | default('') }}"
+           data-config='{{ m.options_config | default([]) | tojson }}'
+           onclick="handleMenuCardClick(this)"
+           class="border rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition cursor-pointer bg-white group flex flex-col justify-between hover:border-indigo-500">
+        <div>
+          {% if m.image_url %}
+          <img src="{{ m.image_url }}" alt="{{ m.name }}" class="w-full h-40 object-cover group-hover:scale-105 transition duration-300">
+          {% else %}
+          <div class="w-full h-40 bg-slate-100 flex items-center justify-center text-slate-400">🍲 ไม่มีรูป</div>
+          {% endif %}
+          <div class="p-4">
+            <span class="text-[10px] px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 font-medium">{{ m.category }}</span>
+            <h4 class="font-bold text-base text-slate-800 mt-1">{{ m.name }}</h4>
+          </div>
+        </div>
+        <div class="px-4 pb-4 flex justify-between items-center">
+          <span class="text-lg font-extrabold text-emerald-600">{{ "%.2f"|format(m.price) }} ฿</span>
+          <button class="bg-emerald-500 group-hover:bg-emerald-600 text-white text-xs font-bold px-3 py-1.5 rounded-xl transition flex items-center gap-1 shadow">
+            ➕ เลือกสั่ง
+          </button>
+        </div>
+      </div>
+      {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+<!-- 🛍️ แถบตะกร้าสินค้าลอยด้านล่าง -->
+<div id="grabCartBar" class="hidden fixed bottom-4 left-1/2 -translate-x-1/2 w-11/12 max-w-2xl bg-indigo-950 text-white p-4 rounded-2xl shadow-2xl z-40 border border-indigo-700 flex justify-between items-center">
+  <div class="flex items-center gap-3">
+    <div class="bg-emerald-500 text-white font-extrabold text-sm w-9 h-9 rounded-full flex items-center justify-center shadow" id="cartBadgeCount">0</div>
+    <div>
+      <div class="text-xs text-slate-300">ยอดรวมตะกร้า (โต๊ะ <span id="cartTableNum">1</span>)</div>
+      <div class="text-lg font-extrabold text-emerald-400" id="cartTotalPrice">0.00 ฿</div>
+    </div>
+  </div>
+  <button onclick="submitGrabCart()" class="bg-emerald-500 hover:bg-emerald-600 text-white font-bold px-6 py-2.5 rounded-xl shadow-lg transition flex items-center gap-2">
+    🚀 ยืนยันสั่งอาหาร
+  </button>
+</div>
+
+<!-- 📝 Modal เลือกตัวเลือกอาหาร -->
+<div id="grabModal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+  <div class="bg-white rounded-2xl max-w-md w-full overflow-hidden shadow-2xl animate-fade-in">
+    <div class="relative">
+      <img id="modalImage" src="" class="w-full h-48 object-cover hidden">
+      <button onclick="closeGrabModal()" class="absolute top-3 right-3 bg-black/50 text-white w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold hover:bg-black/80">✕</button>
+    </div>
+    
+    <div class="p-6 space-y-4 max-h-[70vh] overflow-y-auto">
+      <div>
+        <h3 id="modalTitle" class="text-xl font-bold text-slate-800">ชื่อเมนู</h3>
+        <p id="modalPrice" class="text-lg font-extrabold text-emerald-600 mt-1">0.00 ฿</p>
+      </div>
+
+      <hr class="border-slate-100">
+
+      <div id="dynamicOptionsContainer" class="space-y-4"></div>
+
+      <div>
+        <label class="block text-xs font-bold text-slate-700 mb-1">📝 หมายเหตุเพิ่มเติม:</label>
+        <input type="text" id="modalNotes" placeholder="เช่น ไม่ใส่ผักกาด, ขอน้ำซุปร้อนๆ" class="w-full text-xs p-2.5 border rounded-xl outline-none focus:ring-2 focus:ring-indigo-500">
+      </div>
+
+      <div class="flex justify-between items-center pt-2">
+        <span class="text-xs font-bold text-slate-700">จำนวนจาน:</span>
+        <div class="flex items-center gap-3 bg-slate-100 p-1.5 rounded-xl border">
+          <button onclick="adjustModalQty(-1)" class="w-8 h-8 bg-white font-bold text-slate-700 rounded-lg shadow hover:bg-slate-200">-</button>
+          <span id="modalQty" class="font-bold text-sm w-4 text-center">1</span>
+          <button onclick="adjustModalQty(1)" class="w-8 h-8 bg-white font-bold text-slate-700 rounded-lg shadow hover:bg-slate-200">+</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="p-4 bg-slate-50 border-t flex gap-3">
+      <button onclick="closeGrabModal()" class="w-1/3 py-3 text-xs font-bold text-slate-600 bg-slate-200 rounded-xl hover:bg-slate-300">ยกเลิก</button>
+      <button onclick="addToGrabCart()" class="w-2/3 py-3 text-xs font-bold text-white bg-emerald-500 rounded-xl shadow-lg hover:bg-emerald-600">ใส่ตะกร้า</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let currentItem = null;
+let currentQty = 1;
+let currentOptionsConfig = [];
+let grabCart = [];
+
+function handleMenuCardClick(el) {
+  const id = parseInt(el.getAttribute('data-id'));
+  const name = el.getAttribute('data-name');
+  const price = parseFloat(el.getAttribute('data-price'));
+  const img = el.getAttribute('data-img');
+  const configRaw = el.getAttribute('data-config');
+  let config = [];
+  try {
+    config = JSON.parse(configRaw);
+  } catch(e) {
+    config = [];
+  }
+  openGrabModal(id, name, price, img, config);
+}
+
+function changeActiveTable() {
+  const tableId = document.getElementById('selectedTableSelect').value;
+  document.getElementById('cartTableNum').innerText = tableId;
+}
+
+function openGrabModal(id, name, price, img, optionsConfig) {
+  currentItem = { id, name, price };
+  currentQty = 1;
+  currentOptionsConfig = optionsConfig || [];
+  
+  document.getElementById('modalQty').innerText = currentQty;
+  document.getElementById('modalTitle').innerText = name;
+  document.getElementById('modalPrice').innerText = price.toFixed(2) + ' ฿';
+  document.getElementById('modalNotes').value = '';
+
+  const imgEl = document.getElementById('modalImage');
+  if (img) {
+    imgEl.src = img;
+    imgEl.classList.remove('hidden');
+  } else {
+    imgEl.classList.add('hidden');
+  }
+
+  renderDynamicOptions(currentOptionsConfig);
+
+  document.getElementById('grabModal').classList.remove('hidden');
+}
+
+function renderDynamicOptions(configs) {
+  const container = document.getElementById('dynamicOptionsContainer');
+  container.innerHTML = '';
+
+  if (!configs || configs.length === 0) {
+    return;
+  }
+
+  configs.forEach((group, gIdx) => {
+    const isRequired = group.required;
+    const isSingle = group.type === 'single';
+
+    let html = `
+      <div class="opt-group bg-slate-50 p-3 rounded-xl border border-slate-200" data-group-title="${group.title}" data-required="${isRequired}" data-type="${group.type}">
+        <div class="flex justify-between items-center mb-2">
+          <label class="text-xs font-bold text-slate-800">${group.title}</label>
+          ${isRequired 
+            ? '<span class="text-[10px] bg-red-100 text-red-600 font-bold px-2 py-0.5 rounded-full">⚠️ บังคับเลือก</span>' 
+            : '<span class="text-[10px] bg-slate-200 text-slate-600 font-bold px-2 py-0.5 rounded-full">ไม่บังคับ</span>'}
+        </div>
+        <div class="space-y-1.5 text-xs">
+    `;
+
+    group.choices.forEach((c) => {
+      const inputName = `opt_group_${gIdx}`;
+      const inputType = isSingle ? 'radio' : 'checkbox';
+      const priceText = c.price > 0 ? `(+${c.price.toFixed(2)} ฿)` : '';
+
+      html += `
+        <label class="flex justify-between items-center p-2 bg-white rounded-lg border cursor-pointer hover:border-indigo-400">
+          <span class="flex items-center gap-2">
+            <input type="${inputType}" name="${inputName}" value="${c.label}" data-extra-price="${c.price}" class="opt-input text-indigo-600">
+            <span>${c.label}</span>
+          </span>
+          <span class="font-bold text-slate-500">${priceText}</span>
+        </label>
+      `;
+    });
+
+    html += `</div></div>`;
+    container.insertAdjacentHTML('beforeend', html);
+  });
+}
+
+function closeGrabModal() {
+  document.getElementById('grabModal').classList.add('hidden');
+}
+
+function adjustModalQty(delta) {
+  currentQty += delta;
+  if (currentQty < 1) currentQty = 1;
+  document.getElementById('modalQty').innerText = currentQty;
+}
+
+function addToGrabCart() {
+  let extraPriceTotal = 0;
+  let selectedOptionsText = [];
+  let hasError = false;
+
+  document.querySelectorAll('#dynamicOptionsContainer .opt-group').forEach(groupEl => {
+    if (hasError) return;
+
+    const groupTitle = groupEl.getAttribute('data-group-title');
+    const isRequired = groupEl.getAttribute('data-required') === 'true';
+    const checkedInputs = groupEl.querySelectorAll('.opt-input:checked');
+
+    if (isRequired && checkedInputs.length === 0) {
+      alert(`กรุณาเลือกตัวเลือกในหมวด "${groupTitle}" (บังคับเลือก)`);
+      hasError = true;
+      return;
+    }
+
+    checkedInputs.forEach(input => {
+      const label = input.value;
+      const price = parseFloat(input.getAttribute('data-extra-price')) || 0;
+      extraPriceTotal += price;
+
+      const pText = price > 0 ? ` (+${price.toFixed(2)}฿)` : '';
+      selectedOptionsText.push(`${groupTitle}: ${label}${pText}`);
+    });
+  });
+
+  if (hasError) return;
+
+  const notes = document.getElementById('modalNotes').value.trim();
+  if (notes) {
+    selectedOptionsText.push(`หมายเหตุ: ${notes}`);
+  }
+
+  const finalUnitPrice = currentItem.price + extraPriceTotal;
+  const optionsStr = selectedOptionsText.join(' | ');
+
+  grabCart.push({
+    menu_id: currentItem.id,
+    name: currentItem.name,
+    price: finalUnitPrice,
+    quantity: currentQty,
+    options: optionsStr
+  });
+
+  updateCartBar();
+  closeGrabModal();
+}
+
+function updateCartBar() {
+  const cartBar = document.getElementById('grabCartBar');
+  if (grabCart.length === 0) {
+    cartBar.classList.add('hidden');
+    return;
+  }
+
+  cartBar.classList.remove('hidden');
+  const totalCount = grabCart.reduce((sum, item) => sum + item.quantity, 0);
+  const totalPrice = grabCart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+
+  document.getElementById('cartBadgeCount').innerText = totalCount;
+  document.getElementById('cartTotalPrice').innerText = totalPrice.toFixed(2) + ' ฿';
+  changeActiveTable();
+}
+
+function submitGrabCart() {
+  const tableId = document.getElementById('selectedTableSelect').value;
+  if (!tableId) {
+    alert('กรุณาเลือกโต๊ะก่อนส่งออเดอร์');
+    return;
+  }
+
+  fetch('/add_batch_order', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      table_id: tableId,
+      items: grabCart
+    })
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.success) {
+      grabCart = [];
+      updateCartBar();
+      window.location.reload();
+    } else {
+      alert(data.message || 'เกิดข้อผิดพลาดในการสั่งอาหาร');
+    }
+  })
+  .catch(err => {
+    console.error(err);
+    alert('ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้');
+  });
+}
+</script>
+{% endblock %}

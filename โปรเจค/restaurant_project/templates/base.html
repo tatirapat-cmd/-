@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ระบบสั่งอาหารร้านอาหารออนไลน์</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-100 font-sans min-h-screen flex flex-col justify-between">
+
+  <!-- Navbar -->
+  <nav class="bg-indigo-950 text-white shadow-lg sticky top-0 z-50">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
+      <a href="/" class="text-lg font-extrabold flex items-center gap-2 text-amber-400 hover:text-amber-300 transition">
+        <span>🍲</span>
+        <span>KKU Restaurant</span>
+      </a>
+
+      <div class="flex items-center gap-4 text-xs font-semibold">
+        <a href="/" class="hover:text-amber-300 transition">🏠 หน้าหลัก</a>
+        <a href="/tables" class="hover:text-amber-300 transition">🍽️ สั่งอาหาร</a>
+
+        {% if session.get('user') %}
+          {% if session['user']['role'] in ['admin', 'staff'] %}
+            <a href="/kitchen" class="hover:text-amber-300 transition">🍳 ห้องครัว</a>
+            <a href="/admin/members" class="hover:text-amber-300 transition text-amber-300">👥 แต้มสมาชิก</a>
+          {% endif %}
+
+          {% if session['user']['role'] == 'admin' %}
+            <a href="/report" class="hover:text-amber-300 transition">📊 ยอดขาย</a>
+          {% endif %}
+
+          <a href="/profile" class="hover:text-amber-300 transition bg-indigo-900 px-3 py-1.5 rounded-lg border border-indigo-700 flex items-center gap-1">
+            👤 {{ session['user']['username'] }}
+          </a>
+
+          <a href="/logout" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded-lg transition shadow">
+            🚪 ออกจากระบบ
+          </a>
+        {% else %}
+          <a href="/login" class="bg-amber-500 hover:bg-amber-600 text-slate-900 px-3.5 py-1.5 rounded-lg transition font-bold shadow">
+            🔑 เข้าสู่ระบบ
+          </a>
+        {% endif %}
+      </div>
+    </div>
+  </nav>
+
+  <!-- Flash Messages Notification -->
+  <div class="max-w-4xl mx-auto w-full px-4 mt-4">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="p-3 mb-2 rounded-xl text-xs font-bold shadow-sm flex justify-between items-center {% if category == 'error' %}bg-red-100 text-red-800 border border-red-200{% else %}bg-emerald-100 text-emerald-800 border border-emerald-200{% endif %}">
+            <span>{{ message }}</span>
+            <button onclick="this.parentElement.remove()" class="text-slate-500 hover:text-slate-800 font-extrabold px-1">✕</button>
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+  </div>
+
+  <!-- Main Content Area -->
+  <main class="max-w-6xl mx-auto px-4 my-4 flex-grow w-full">
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-indigo-950 text-slate-400 text-[11px] py-4 text-center border-t border-indigo-900">
+    <div>© 2026 KKU Restaurant Project - All Rights Reserved</div>
+  </footer>
+
+</body>
+</html>

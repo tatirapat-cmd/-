@@ -1,0 +1,154 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="max-w-2xl mx-auto bg-white p-8 rounded-xl shadow-md border border-slate-200 mt-4">
+  <div class="flex justify-between items-center mb-6">
+    <h2 class="text-2xl font-bold text-slate-800">➕ เพิ่มเมนูอาหารใหม่</h2>
+    <a href="/" class="text-xs text-slate-500 hover:text-indigo-600 font-medium flex items-center gap-1">⬅️ กลับหน้าหลัก</a>
+  </div>
+  
+  <form id="addMenuForm" method="POST" action="/add_menu" onsubmit="prepareOptionsJson()" class="space-y-5">
+    <input type="hidden" id="options_config_json" name="options_config_json" value="[]">
+
+    <div>
+      <label class="block text-sm font-medium text-slate-700">ชื่อเมนูอาหาร</label>
+      <input type="text" name="name" placeholder="เช่น ข้าวผัดกุ้ง, สเต็กเนื้อ" required class="mt-1 w-full p-2.5 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none">
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium text-slate-700">หมวดหมู่</label>
+      <select name="category" required class="mt-1 w-full p-2.5 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none bg-white">
+        <option value="" disabled selected>-- เลือกหมวดหมู่ --</option>
+        <option value="อาหารเรียกน้ำย่อย / ของทานเล่น (Appetizers / Starters)">อาหารเรียกน้ำย่อย / ของทานเล่น (Appetizers / Starters)</option>
+        <option value="อาหารจานหลัก (Main Courses)">อาหารจานหลัก (Main Courses)</option>
+        <option value="อาหารจานเดียว / ข้าวและเส้น (Single Dishes / Rice & Noodles)">อาหารจานเดียว / ข้าวและเส้น (Single Dishes / Rice & Noodles)</option>
+        <option value="อาหารประเภทกับข้าว (Shared Dishes)">อาหารประเภทกับข้าว (Shared Dishes)</option>
+        <option value="ของหวาน (Desserts)">ของหวาน (Desserts)</option>
+        <option value="เครื่องดื่ม (Beverages)">เครื่องดื่ม (Beverages)</option>
+      </select>
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium text-slate-700">ราคาเริ่มต้น (บาท)</label>
+      <input type="number" step="0.01" name="price" placeholder="60.00" required class="mt-1 w-full p-2.5 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none">
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium text-slate-700">URL รูปภาพอาหาร</label>
+      <input type="url" name="image_url" placeholder="https://images.unsplash.com/..." class="mt-1 w-full p-2.5 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none">
+    </div>
+
+    <!-- ⚙️ ส่วนตั้งค่าตัวเลือกเสริม (Toppings / Options) -->
+    <div class="border-t pt-4 space-y-3">
+      <div class="flex justify-between items-center">
+        <div>
+          <h3 class="font-bold text-slate-800 text-sm">⚙️ ตั้งค่าตัวเลือกเสริม / ท็อปปิ้ง</h3>
+          <p class="text-xs text-slate-500">กำหนดได้ว่า "บังคับเลือก" หรือ "ไม่บังคับ" พร้อมบวกราคาเพิ่ม</p>
+        </div>
+        <button type="button" onclick="addOptionGroup()" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold text-xs px-3 py-1.5 rounded-lg border border-indigo-200 transition">
+          ➕ เพิ่มกลุ่มตัวเลือก
+        </button>
+      </div>
+
+      <div id="optionGroupsContainer" class="space-y-4 pt-2">
+        <!-- JS จะสร้างกลุ่มตัวเลือกที่นี่ -->
+      </div>
+    </div>
+
+    <div class="flex gap-3 pt-4">
+      <a href="/" class="w-1/2 bg-slate-200 hover:bg-slate-300 text-slate-700 text-center font-bold py-2.5 rounded-lg transition">ยกเลิก</a>
+      <button type="submit" class="w-1/2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-lg shadow transition">บันทึกเมนู</button>
+    </div>
+  </form>
+</div>
+
+<script>
+let groupCounter = 0;
+
+function addOptionGroup(data = null) {
+  groupCounter++;
+  const container = document.getElementById('optionGroupsContainer');
+  const groupId = `group_${groupCounter}`;
+
+  const groupHtml = `
+    <div id="${groupId}" class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3 relative">
+      <button type="button" onclick="removeGroup('${groupId}')" class="absolute top-3 right-3 text-red-500 hover:text-red-700 font-bold text-xs bg-white border border-red-200 rounded px-2 py-1">🗑️ ลบกลุ่มนี้</button>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-3 pr-16">
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">ชื่อกลุ่มตัวเลือก</label>
+          <input type="text" class="group-title text-xs p-2 border rounded-lg w-full bg-white outline-none" placeholder="เช่น ระดับความเผ็ด, ท็อปปิ้ง" value="${data ? data.title : ''}" required>
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">ประเภทการเลือก</label>
+          <select class="group-type text-xs p-2 border rounded-lg w-full bg-white outline-none">
+            <option value="single" ${data && data.type === 'single' ? 'selected' : ''}>เลือกได้ 1 อย่าง (Radio)</option>
+            <option value="multiple" ${data && data.type === 'multiple' ? 'selected' : ''}>เลือกได้หลายอย่าง (Checkbox)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <input type="checkbox" id="req_${groupId}" class="group-required w-4 h-4 text-indigo-600 rounded" ${data && data.required ? 'checked' : ''}>
+        <label for="req_${groupId}" class="text-xs font-bold text-amber-700">⚠️ บังคับเลือก (ลูกค้าต้องเลือกอย่างน้อย 1 ข้อก่อนสั่ง)</label>
+      </div>
+
+      <div class="space-y-2 border-t pt-2">
+        <label class="block text-xs font-bold text-slate-600">รายการตัวเลือกย่อย & ราคาบวกเพิ่ม:</label>
+        <div class="choices-container space-y-2"></div>
+        <button type="button" onclick="addChoiceItem('${groupId}')" class="text-xs text-indigo-600 font-bold hover:underline">+ เพิ่มตัวเลือกย่อย</button>
+      </div>
+    </div>
+  `;
+
+  container.insertAdjacentHTML('beforeend', groupHtml);
+
+  if (data && data.choices) {
+    data.choices.forEach(c => addChoiceItem(groupId, c));
+  } else {
+    // default 2 choice items
+    addChoiceItem(groupId, { label: 'ปกติ / ไม่ใส่', price: 0 });
+    addChoiceItem(groupId, { label: 'พิเศษ', price: 10 });
+  }
+}
+
+function removeGroup(groupId) {
+  document.getElementById(groupId).remove();
+}
+
+function addChoiceItem(groupId, choiceData = null) {
+  const choicesContainer = document.querySelector(`#${groupId} .choices-container`);
+  const choiceHtml = `
+    <div class="choice-row flex gap-2 items-center">
+      <input type="text" class="choice-label text-xs p-1.5 border rounded w-2/3 bg-white" placeholder="ชื่อตัวเลือก (เช่น เผ็ดมาก, เพิ่มไข่ดาว)" value="${choiceData ? choiceData.label : ''}" required>
+      <input type="number" step="0.01" class="choice-price text-xs p-1.5 border rounded w-1/3 bg-white" placeholder="+ราคา (บาท)" value="${choiceData ? choiceData.price : 0}">
+      <button type="button" onclick="this.parentElement.remove()" class="text-red-500 font-bold text-xs px-1">✕</button>
+    </div>
+  `;
+  choicesContainer.insertAdjacentHTML('beforeend', choiceHtml);
+}
+
+function prepareOptionsJson() {
+  const groups = [];
+  document.querySelectorAll('#optionGroupsContainer > div').forEach(groupEl => {
+    const title = groupEl.querySelector('.group-title').value.trim();
+    const type = groupEl.querySelector('.group-type').value;
+    const required = groupEl.querySelector('.group-required').checked;
+
+    const choices = [];
+    groupEl.querySelectorAll('.choice-row').forEach(row => {
+      const label = row.querySelector('.choice-label').value.trim();
+      const price = parseFloat(row.querySelector('.choice-price').value) || 0.0;
+      if (label) {
+        choices.push({ label, price });
+      }
+    });
+
+    if (title && choices.length > 0) {
+      groups.push({ title, type, required, choices });
+    }
+  });
+
+  document.getElementById('options_config_json').value = JSON.stringify(groups);
+}
+</script>
+{% endblock %}

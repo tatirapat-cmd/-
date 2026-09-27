@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="space-y-6">
+  <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex justify-between items-center">
+    <div class="flex items-center gap-3">
+      <span class="text-2xl">🧑‍🍳</span>
+      <h2 class="text-xl font-bold text-slate-800">หน้าจอสั่งอาหารสำหรับครัว (Kitchen Display)</h2>
+    </div>
+    <a href="/" class="bg-slate-200 hover:bg-slate-300 text-slate-700 text-sm font-semibold px-4 py-2 rounded-lg transition flex items-center gap-1">
+      ⬅️ กลับหน้าหลัก
+    </a>
+  </div>
+
+  <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+    <div class="overflow-x-auto">
+      <table class="w-full text-left border-collapse">
+        <thead>
+          <tr class="bg-slate-100 border-b text-slate-600 text-sm">
+            <th class="p-3">Order ID</th>
+            <th class="p-3">โต๊ะ</th>
+            <th class="p-3">รายการอาหาร / ตัวเลือก</th>
+            <th class="p-3 text-center">จำนวน</th>
+            <th class="p-3">สถานะ</th>
+            <th class="p-3">การดำเนินการ</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y text-slate-700">
+          {% for o in orders %}
+          <tr>
+            <td class="p-3 font-mono text-xs text-slate-500">#{{ o.order_id }}</td>
+            <td class="p-3 font-bold text-indigo-900">โต๊ะ {{ o.table_id }}</td>
+            <td class="p-3">
+              <span class="font-bold block">{{ o.menu_name }}</span>
+              {% if o.options %}
+              <span class="text-xs text-amber-600 font-semibold bg-amber-50 px-2 py-0.5 rounded border border-amber-200 inline-block mt-1">🌶️ {{ o.options }}</span>
+              {% endif %}
+            </td>
+            <td class="p-3 text-center font-bold text-lg text-emerald-600">{{ o.quantity }}</td>
+            <td class="p-3">
+              <span class="px-2.5 py-1 text-xs rounded-full font-semibold {% if o.status == 'รอดำเนินการ' %}bg-amber-100 text-amber-800{% elif o.status == 'กำลังเตรียม' %}bg-blue-100 text-blue-800{% else %}bg-green-100 text-green-800{% endif %}">
+                {{ o.status }}
+              </span>
+            </td>
+            <td class="p-3">
+              <form action="/update_kitchen" method="POST" class="flex gap-2">
+                <input type="hidden" name="order_id" value="{{ o.order_id }}">
+                <button name="status" value="กำลังเตรียม" class="bg-blue-500 hover:bg-blue-600 text-white text-xs px-2.5 py-1.5 rounded font-semibold transition">กำลังเตรียม</button>
+                <button name="status" value="เสิร์ฟแล้ว" class="bg-emerald-500 hover:bg-emerald-600 text-white text-xs px-2.5 py-1.5 rounded font-semibold transition">เสิร์ฟแล้ว</button>
+              </form>
+            </td>
+          </tr>
+          {% else %}
+          <tr>
+            <td colspan="6" class="p-6 text-center text-slate-400">ไม่มีรายการอาหารค้างอยู่ในขณะนี้</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

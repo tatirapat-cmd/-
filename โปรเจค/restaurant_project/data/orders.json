@@ -1,0 +1,52 @@
+[
+    {
+        "order_id": 1,
+        "table_id": 1,
+        "menu_id": 1,
+        "menu_name": "Gazpacho",
+        "price": 150.0,
+        "quantity": 1,
+        "status": "ปิดบิล",
+        "timestamp": "2026-09-24 16:11:04"
+    },
+    {
+        "order_id": 2,
+        "table_id": 1,
+        "menu_id": 2,
+        "menu_name": "Porchetta",
+        "price": 250.0,
+        "quantity": 1,
+        "status": "ปิดบิล",
+        "timestamp": "2026-09-24 16:16:27"
+    },
+    {
+        "order_id": 3,
+        "table_id": 1,
+        "menu_id": 2,
+        "menu_name": "Porchetta",
+        "price": 250.0,
+        "quantity": 4,
+        "status": "ปิดบิล",
+        "timestamp": "2026-09-24 16:26:51"
+    },
+    {
+        "order_id": 4,
+        "table_id": 1,
+        "menu_id": 1,
+        "menu_name": "Gazpacho",
+        "price": 150.0,
+        "quantity": 3,
+        "status": "ปิดบิล",
+        "timestamp": "2026-09-24 16:31:03"
+    },
+    {
+        "order_id": 5,
+        "table_id": 1,
+        "menu_id": 2,
+        "menu_name": "Porchetta",
+        "price": 250.0,
+        "quantity": 3,
+        "status": "ปิดบิล",
+        "timestamp": "2026-09-24 16:31:07"
+    }
+]

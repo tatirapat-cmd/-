@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="max-w-4xl mx-auto space-y-6 my-6">
+  <!-- Header bar -->
+  <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex flex-col md:flex-row justify-between md:items-center gap-4">
+    <div>
+      <h2 class="text-xl font-extrabold text-slate-800">👥 ตรวจสอบและจัดการแต้มสะสมสมาชิก</h2>
+      <p class="text-xs text-slate-500 mt-0.5">รายชื่อผู้ใช้งานทั้งหมดในระบบพร้อมแต้มสะสมคงเหลือ</p>
+    </div>
+    <div class="bg-amber-50 border border-amber-200 px-4 py-2 rounded-xl text-right">
+      <span class="text-[10px] text-amber-800 font-bold block">ยอดแต้มสะสมรวมทั้งระบบ</span>
+      <span class="text-lg font-black text-amber-600">{{ total_points }} แต้ม</span>
+    </div>
+  </div>
+
+  <!-- ตารางรายชื่อสมาชิก -->
+  <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+    <table class="w-full text-xs text-left">
+      <thead class="bg-slate-50 text-slate-600 font-bold border-b">
+        <tr>
+          <th class="p-4">ชื่อผู้ใช้งาน (Username)</th>
+          <th class="p-4">ระดับสิทธิ์ (Role)</th>
+          <th class="p-4 text-center">แต้มคงเหลือ (Points)</th>
+          {% if session.get('user') and session['user']['role'] == 'admin' %}
+          <th class="p-4 text-right">จัดการแต้ม (Admin Only)</th>
+          {% endif %}
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-slate-100">
+        {% for u in users %}
+        <tr class="hover:bg-slate-50/50 transition">
+          <td class="p-4 font-bold text-slate-800 flex items-center gap-2">
+            <span>👤</span>
+            <span>{{ u.username }}</span>
+          </td>
+          <td class="p-4">
+            {% if u.role == 'admin' %}
+              <span class="px-2.5 py-1 bg-purple-100 text-purple-800 font-extrabold rounded-full text-[10px]">ADMIN</span>
+            {% elif u.role == 'staff' %}
+              <span class="px-2.5 py-1 bg-blue-100 text-blue-800 font-extrabold rounded-full text-[10px]">STAFF</span>
+            {% else %}
+              <span class="px-2.5 py-1 bg-slate-100 text-slate-700 font-bold rounded-full text-[10px]">CUSTOMER</span>
+            {% endif %}
+          </td>
+          <td class="p-4 text-center font-black text-amber-600 text-sm">
+            🪙 {{ u.points if u.points is not none else 0 }} แต้ม
+          </td>
+          {% if session.get('user') and session['user']['role'] == 'admin' %}
+          <td class="p-4 text-right">
+            <form action="/admin/update_points" method="POST" class="inline-flex items-center gap-2 justify-end">
+              <input type="hidden" name="username" value="{{ u.username }}">
+              <input type="number" min="0" name="points" value="{{ u.points if u.points is not none else 0 }}" class="w-20 p-1.5 border rounded-lg text-xs outline-none focus:ring-1 focus:ring-amber-500 text-center font-bold bg-slate-50">
+              <button type="submit" class="bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold px-3 py-1.5 rounded-lg transition text-[11px] whitespace-nowrap shadow">
+                💾 แก้ไขแต้ม
+              </button>
+            </form>
+          </td>
+          {% endif %}
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

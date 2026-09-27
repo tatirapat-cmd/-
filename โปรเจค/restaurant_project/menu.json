@@ -1,0 +1,11 @@
+[
+  {
+    "id": 2,
+    "name": "Pizza",
+    "category": "อาหารจานหลัก (Main Courses)",
+    "price": 300.0,
+    "image_url": "https://salindaresort.com/webroot/uploads_ckfinder/images/italian-food-4.jpg",
+    "is_available": true,
+    "options_config": []
+  }
+]

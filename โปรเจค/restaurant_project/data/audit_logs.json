@@ -1,0 +1,74 @@
+[
+    {
+        "timestamp": "2026-09-24 15:52:04",
+        "username": "TBO",
+        "action": "REGISTER",
+        "details": "ลงทะเบียนผู้ใช้ใหม่ Role: admin"
+    },
+    {
+        "timestamp": "2026-09-24 15:52:09",
+        "username": "TBO",
+        "action": "ADD_TABLE",
+        "details": "เพิ่มโต๊ะหมายเลข 1"
+    },
+    {
+        "timestamp": "2026-09-24 15:52:09",
+        "username": "TBO",
+        "action": "ADD_TABLE",
+        "details": "เพิ่มโต๊ะหมายเลข 2"
+    },
+    {
+        "timestamp": "2026-09-24 15:52:09",
+        "username": "TBO",
+        "action": "ADD_TABLE",
+        "details": "เพิ่มโต๊ะหมายเลข 3"
+    },
+    {
+        "timestamp": "2026-09-24 15:52:09",
+        "username": "TBO",
+        "action": "ADD_TABLE",
+        "details": "เพิ่มโต๊ะหมายเลข 4"
+    },
+    {
+        "timestamp": "2026-09-24 15:52:09",
+        "username": "TBO",
+        "action": "ADD_TABLE",
+        "details": "เพิ่มโต๊ะหมายเลข 5"
+    },
+    {
+        "timestamp": "2026-09-24 16:05:15",
+        "username": "เติ้ล",
+        "action": "REGISTER",
+        "details": "ลงทะเบียนผู้ใช้ใหม่ Role: customer"
+    },
+    {
+        "timestamp": "2026-09-24 16:10:54",
+        "username": "TBO",
+        "action": "ADD_MENU",
+        "details": "เพิ่มเมนู ID:1 Gazpacho ราคา 150.0"
+    },
+    {
+        "timestamp": "2026-09-24 16:14:59",
+        "username": "TBO",
+        "action": "ADD_MENU",
+        "details": "เพิ่มเมนู ID:2 Porchetta ราคา 250.0"
+    },
+    {
+        "timestamp": "2026-09-24 16:26:41",
+        "username": "TBO",
+        "action": "CHECKOUT",
+        "details": "เช็คบิลโต๊ะ 1 ยอดรวม 470.8 บาท"
+    },
+    {
+        "timestamp": "2026-09-24 16:27:11",
+        "username": "TBO",
+        "action": "CHECKOUT",
+        "details": "เช็คบิลโต๊ะ 1 ยอดรวม 1035.76 บาท"
+    },
+    {
+        "timestamp": "2026-09-24 16:31:28",
+        "username": "TBO",
+        "action": "CHECKOUT",
+        "details": "เช็คบิลโต๊ะ 1 ยอดรวม 1200.54 บาท"
+    }
+]

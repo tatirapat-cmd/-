@@ -1,0 +1,145 @@
+[
+  {
+    "order_id": 1,
+    "table_id": 1,
+    "menu_id": 1,
+    "menu_name": "กะเพราไก่ไข่ดาว",
+    "price": 60.0,
+    "quantity": 2,
+    "options": "เผ็ดมาก | เพิ่มไข่ดาว (+10), พิเศษ (+15) | หมายเหตุ: ไม่เอาพริก",
+    "status": "ปิดบิล",
+    "timestamp": "2026-09-24 21:41:37"
+  },
+  {
+    "order_id": 2,
+    "table_id": 67,
+    "menu_id": 1,
+    "menu_name": "กะเพราไก่ไข่ดาว",
+    "price": 60.0,
+    "quantity": 2,
+    "options": "",
+    "status": "ปิดบิล",
+    "timestamp": "2026-09-24 21:57:46"
+  },
+  {
+    "order_id": 3,
+    "table_id": 67,
+    "menu_id": 1,
+    "menu_name": "กะเพราไก่ไข่ดาว",
+    "price": 60.0,
+    "quantity": 3,
+    "options": "",
+    "status": "ปิดบิล",
+    "timestamp": "2026-09-24 22:00:30"
+  },
+  {
+    "order_id": 4,
+    "table_id": 1,
+    "menu_id": 1,
+    "menu_name": "กะเพราไก่ไข่ดาว",
+    "price": 60.0,
+    "quantity": 1,
+    "options": "",
+    "status": "ปิดบิล",
+    "timestamp": "2026-09-24 22:02:34"
+  },
+  {
+    "order_id": 5,
+    "table_id": 1,
+    "menu_id": 2,
+    "menu_name": "Pizza",
+    "price": 300.0,
+    "quantity": 1,
+    "options": "",
+    "status": "ปิดบิล",
+    "timestamp": "2026-09-24 22:04:12"
+  },
+  {
+    "order_id": 6,
+    "table_id": 1,
+    "menu_id": 2,
+    "menu_name": "Pizza",
+    "price": 300.0,
+    "quantity": 4,
+    "options": "",
+    "status": "ปิดบิล",
+    "timestamp": "2026-09-27 17:14:38"
+  },
+  {
+    "order_id": 7,
+    "table_id": 67,
+    "menu_id": 2,
+    "menu_name": "Pizza",
+    "price": 300.0,
+    "quantity": 1,
+    "options": "",
+    "status": "ปิดบิล",
+    "timestamp": "2026-09-27 17:25:03"
+  },
+  {
+    "order_id": 8,
+    "table_id": 3,
+    "menu_id": 2,
+    "menu_name": "Pizza",
+    "price": 300.0,
+    "quantity": 1,
+    "options": "",
+    "status": "ปิดบิล",
+    "timestamp": "2026-09-27 17:29:41"
+  },
+  {
+    "order_id": 9,
+    "table_id": 1,
+    "menu_id": 2,
+    "menu_name": "Pizza",
+    "price": 300.0,
+    "quantity": 1,
+    "options": "",
+    "status": "ปิดบิล",
+    "timestamp": "2026-09-27 17:33:04"
+  },
+  {
+    "order_id": 10,
+    "table_id": 1,
+    "menu_id": 2,
+    "menu_name": "Pizza",
+    "price": 300.0,
+    "quantity": 1,
+    "options": "",
+    "status": "ปิดบิล",
+    "timestamp": "2026-09-27 17:41:19"
+  },
+  {
+    "order_id": 11,
+    "table_id": 1,
+    "menu_id": 2,
+    "menu_name": "Pizza",
+    "price": 300.0,
+    "quantity": 1,
+    "options": "",
+    "status": "ปิดบิล",
+    "timestamp": "2026-09-27 18:02:25"
+  },
+  {
+    "order_id": 12,
+    "table_id": 1,
+    "menu_id": 2,
+    "menu_name": "Pizza",
+    "price": 300.0,
+    "quantity": 4,
+    "options": "",
+    "status": "ปิดบิล",
+    "timestamp": "2026-09-27 18:14:22"
+  },
+  {
+    "order_id": 13,
+    "table_id": 1,
+    "menu_id": 2,
+    "menu_name": "Pizza",
+    "price": 300.0,
+    "quantity": 1,
+    "options": "",
+    "status": "ปิดบิล",
+    "timestamp": "2026-09-27 18:19:07"
+  }
+]

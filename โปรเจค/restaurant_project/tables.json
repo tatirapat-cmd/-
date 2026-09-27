@@ -1,0 +1,28 @@
+[
+  {
+    "table_id": 1,
+    "status": "ว่าง",
+    "reservation": null,
+    "current_customer": null
+  },
+  {
+    "table_id": 2,
+    "status": "ว่าง",
+    "reservation": null
+  },
+  {
+    "table_id": 3,
+    "status": "ว่าง",
+    "reservation": null
+  },
+  {
+    "table_id": 4,
+    "status": "ว่าง",
+    "reservation": null
+  },
+  {
+    "table_id": 67,
+    "status": "ว่าง",
+    "reservation": null
+  }
+]

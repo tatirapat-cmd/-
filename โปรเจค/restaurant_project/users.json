@@ -1,0 +1,20 @@
+[
+  {
+    "username": "TBO",
+    "password": "123456",
+    "role": "admin",
+    "points": 0
+  },
+  {
+    "username": "staff",
+    "password": "staffpassword",
+    "role": "staff",
+    "points": 0
+  },
+  {
+    "username": "1",
+    "password": "1",
+    "role": "customer",
+    "points": 135
+  }
+]

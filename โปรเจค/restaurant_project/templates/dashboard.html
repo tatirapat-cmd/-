@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="space-y-6">
+    <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 w-full md:w-auto">
+            <a href="/tables" class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 hover:border-indigo-500 transition flex items-center gap-3">
+                <div class="p-2.5 bg-amber-100 text-amber-600 rounded-lg text-xl">🪑</div>
+                <div><div class="font-bold text-slate-800 text-sm">จัดการโต๊ะ / สั่งอาหาร / จอง</div></div>
+            </a>
+            {% if session.get('user') and session['user']['role'] in ['admin', 'staff'] %}
+            <a href="/kitchen" class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 hover:border-indigo-500 transition flex items-center gap-3">
+                <div class="p-2.5 bg-emerald-100 text-emerald-600 rounded-lg text-xl">🧑‍🍳</div>
+                <div><div class="font-bold text-slate-800 text-sm">หน้าจอครัว</div></div>
+            </a>
+            {% endif %}
+            {% if session.get('user') and session['user']['role'] == 'admin' %}
+            <a href="/report" class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 hover:border-indigo-500 transition flex items-center gap-3">
+                <div class="p-2.5 bg-purple-100 text-purple-600 rounded-lg text-xl">📊</div>
+                <div><div class="font-bold text-slate-800 text-sm">รายงานยอดขาย</div></div>
+            </a>
+            {% endif %}
+        </div>
+
+        {% if session.get('user') and session['user']['role'] == 'admin' %}
+        <a href="/add_menu" class="w-full md:w-auto bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-5 py-3 rounded-xl shadow transition flex items-center justify-center gap-2">
+            ➕ เพิ่มเมนูอาหารใหม่
+        </a>
+        {% endif %}
+    </div>
+
+    <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+        <h3 class="text-xl font-bold text-slate-800 mb-6 flex justify-between items-center">
+            <span>📋 รายการเมนูอาหารทั้งหมด</span>
+        </h3>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {% for item in menu %}
+            <div class="border rounded-xl overflow-hidden shadow-sm flex flex-col justify-between bg-white hover:shadow-md transition">
+                <div>
+                    {% if item.image_url %}
+                    <img src="{{ item.image_url }}" alt="{{ item.name }}" class="w-full h-44 object-cover">
+                    {% else %}
+                    <div class="w-full h-44 bg-slate-100 flex flex-col items-center justify-center text-slate-400">
+                        <span class="text-3xl">🍲</span>
+                        <span class="text-xs mt-1">ไม่มีรูปภาพ</span>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="p-4">
+                        <div class="flex flex-col mb-2 gap-1">
+                            <span class="text-xs px-2.5 py-1 rounded-full bg-indigo-50 text-indigo-700 font-medium border border-indigo-100 w-fit">{{ item.category }}</span>
+                            <h4 class="font-bold text-lg text-slate-800 mt-1">{{ item.name }}</h4>
+                        </div>
+                        <div class="text-xl font-bold text-emerald-600 mb-1">{{ "%.2f"|format(item.price) }} ฿</div>
+                    </div>
+                </div>
+                
+                <div class="px-4 pb-4 pt-2 border-t border-slate-100 flex justify-between items-center">
+                    {% if item.is_available %}
+                        <span class="text-xs text-emerald-600 font-semibold flex items-center gap-1">● พร้อมขาย</span>
+                    {% else %}
+                        <span class="text-xs text-red-500 font-semibold flex items-center gap-1">✖ หมด</span>
+                    {% endif %}
+
+                    {% if session.get('user') and session['user']['role'] == 'admin' %}
+                    <div class="flex items-center gap-2">
+                        <a href="/edit_menu/{{ item.id }}" class="text-xs bg-amber-100 hover:bg-amber-200 text-amber-800 font-semibold px-2.5 py-1 rounded transition">
+                            ✏️ แก้ไข
+                        </a>
+                        <form action="/delete_menu/{{ item.id }}" method="POST" onsubmit="return confirm('คุณต้องการลบเมนู {{ item.name }} ใช่หรือไม่?');">
+                            <button type="submit" class="text-xs bg-red-100 hover:bg-red-200 text-red-600 font-semibold px-2.5 py-1 rounded transition">
+                                🗑️ ลบ
+                            </button>
+                        </form>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% else %}
+            <div class="col-span-3 text-center py-10 text-slate-400">ยังไม่มีเมนูอาหารในระบบ</div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}
